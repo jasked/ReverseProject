@@ -1,3 +1,33 @@
+function get_environment(obj, name){
+    return new Proxy(obj, {
+        get(target, p, receiver){
+			// 过滤没用的信息，不进行打印
+            if (p === "Math" || p === "isNaN" || p === "encodeURI" || p === "Uint8Array" || p.toString().indexOf("Symbol(Symbol.") != -1){
+                let val = Reflect.get(...arguments);
+                return val
+            } else {
+                let val = Reflect.get(...arguments);
+                console.log(`取值:`,name, '.', p, ` =>`, val);
+                return val
+            }
+        },
+        set(target, p, value, receiver){
+            let val = Reflect.get(...arguments);
+            console.log(`设置值:${name}.${p}, ${val} => ${value}`);
+            return Reflect.set(...arguments)
+        }
+    })
+}
+ 
+ 
+// 这里放你要代理的对象--->使用示例
+window = globalThis;
+window = get_environment(window, "window");
+
+
+// ---------------------------- 2.0 上下均可独立运行, 根据实际情况使用
+
+
 dtavm = {}
 dtavm.log = console.log
 function proxy(obj, objname, type) {
